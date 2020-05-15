@@ -1,0 +1,76 @@
+﻿@inherits Instructors.GeneralInstructor
+
+<img src="/images/LoginScreen/Ben/FrontFaceBen.png" style="display:none" @ref="ForwardBenHeadRef" />
+<img src="/images/LoginScreen/Ben/BackFaceBen.png" style="display:none" @ref="BackwardBenHeadRef" />
+<img src="/images/LoginScreen/Ben/LeftFaceBen.png" style="display:none" @ref="LeftBenHeadRef" />
+<img src="/images/LoginScreen/Ben/RightFaceBen.png" style="display:none" @ref="RightBenHeadRef" />
+
+@using Blazor.Extensions.Canvas.Canvas2D;
+@using System.Numerics;
+@using BlazorCanvasLIB;
+@using System.Drawing;
+
+@code {        
+
+    public override Dictionary<Direction, float> WidthMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 147,
+                [Direction.F] = 162,
+                [Direction.L] = 147,
+                [Direction.A] = 162
+            };
+        }
+    }
+
+    public override Dictionary<Direction, float> HeightMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 149,
+                [Direction.F] = 148,
+                [Direction.L] = 149,
+                [Direction.A] = 145
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> HeadMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = ForwardBenHeadRef,
+                [Direction.L] = LeftBenHeadRef,
+                [Direction.R] = RightBenHeadRef,
+                [Direction.A] = BackwardBenHeadRef
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> BodyMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.R] = StaticStuff.WalkBodyRightMedium,
+                [Direction.F] = StaticStuff.WalkBodyTowardMedium,
+                [Direction.L] = StaticStuff.WalkBodyLeftMedium,
+                [Direction.A] = StaticStuff.WalkBodyAwayMedium,
+            };
+        }
+    }
+
+    ElementReference ForwardBenHeadRef;
+    ElementReference LeftBenHeadRef;
+    ElementReference RightBenHeadRef;
+    ElementReference BackwardBenHeadRef;
+
+}

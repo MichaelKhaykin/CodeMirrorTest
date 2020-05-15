@@ -1,0 +1,73 @@
+﻿@inherits GeneralInstructor
+
+<img src="/images/LoginScreen/Abe/RightFaceAbe.png" style="display:none" @ref="RightHeadAbe" />
+<img src="/images/LoginScreen/Abe/FrontFaceAbe.png" style="display:none" @ref="TowardHeadAbe" />
+<img src="/images/LoginScreen/Abe/LeftFaceAbe.png" style="display:none" @ref="LeftHeadAbe" />
+<img src="/images/LoginScreen/Abe/BackFaceAbe.png" style="display:none" @ref="BackHeadAbe" />
+
+@using System.Numerics;
+@using System.Drawing;
+@using BlazorCanvasLIB;
+
+@code {
+    ElementReference RightHeadAbe;
+    ElementReference LeftHeadAbe;
+    ElementReference TowardHeadAbe;
+    ElementReference BackHeadAbe;
+
+    public override Dictionary<Direction, float> WidthMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 144,
+                [Direction.F] = 161,
+                [Direction.L] = 144,
+                [Direction.A] = 163
+            };
+        }
+    }
+
+    public override Dictionary<Direction, float> HeightMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 164,
+                [Direction.F] = 163,
+                [Direction.L] = 164,
+                [Direction.A] = 163
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> HeadMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = TowardHeadAbe,
+                [Direction.L] = LeftHeadAbe,
+                [Direction.R] = RightHeadAbe,
+                [Direction.A] = BackHeadAbe
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> BodyMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.R] = StaticStuff.WalkBodyRightDark,
+                [Direction.F] = StaticStuff.WalkBodyTowardDark,
+                [Direction.L] = StaticStuff.WalkBodyLeftDark,
+                [Direction.A] = StaticStuff.WalkBodyAwayDark,
+            };
+        }
+    }
+}

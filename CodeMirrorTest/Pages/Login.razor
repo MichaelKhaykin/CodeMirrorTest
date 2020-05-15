@@ -1,0 +1,229 @@
+﻿@page "/"
+
+@using Blazor.Extensions;
+@using Blazor.Extensions.Canvas;
+@using Blazor.Extensions.Canvas.Canvas2D;
+@using System.Drawing;
+@using BlazorCanvasLIB;
+@using System.Numerics;
+@using Instructors;
+@using Newtonsoft.Json;
+
+@inject IJSRuntime JSRunTime
+@inject NavigationManager NM
+
+<div @onkeydown="@KeyDown" tabindex="0" @ref="globalDiv"></div>
+<div @onmousedown="@MouseDown" @onmouseup="@MouseUp" @ref="div">
+    <BECanvas Width="@StaticStuff.CanvasWidth" Height="@StaticStuff.CanvasHeight" @ref="canvas"></BECanvas>
+</div>
+
+<img src="/images/SigninWithGitHubButton.png" style="display:none" @ref="loginElementRef" />
+
+<CodeMirrorTest.Instructors.GeneralInstructor></CodeMirrorTest.Instructors.GeneralInstructor>
+
+
+@if (context != null && StaticStuff.WalkBodyAwayDark.Id != null)
+{
+    <CodeMirrorTest.Instructors.Ben UpdateFrameTime="updateFrameTime"
+                                    StartPosition="benStartPos"
+                                    Scale="globalScale"
+                                    Origin="CenterOrigin"
+                                    Speed="speed"
+                                    Bounds="Bounds"
+                                    TraversalType="TraversalType.RFLA"
+                                    @ref="Instructors[0]">
+    </CodeMirrorTest.Instructors.Ben>
+
+    <CodeMirrorTest.Instructors.Abe UpdateFrameTime="updateFrameTime" Bounds="Bounds" Scale="globalScale" Origin="CenterOrigin"
+                                    StartPosition="abeStartPos" Speed="speed" TraversalType="TraversalType.RFLA" @ref="Instructors[1]">
+    </CodeMirrorTest.Instructors.Abe>
+
+    <CodeMirrorTest.Instructors.Stan UpdateFrameTime="updateFrameTime" Bounds="stanBounds" Scale="globalScale" Origin="CenterOrigin"
+                                     StartPosition="stanStartPos" Speed="speed" TraversalType="TraversalType.RFLA" @ref="Instructors[2]">
+
+    </CodeMirrorTest.Instructors.Stan>
+
+    <CodeMirrorTest.Instructors.Aria UpdateFrameTime="updateFrameTime" Bounds="Bounds" Scale="globalScale" Origin="CenterOrigin"
+                                     StartPosition="ariaStartPosition" Speed="speed" TraversalType="TraversalType.FLAR" @ref="Instructors[3]">
+    </CodeMirrorTest.Instructors.Aria>
+
+    <CodeMirrorTest.Instructors.Kevin UpdateFrameTime="updateFrameTime" Bounds="Bounds" Scale="globalScale" Origin="CenterOrigin"
+                                      StartPosition="kevinStartPosition" Speed="speed" TraversalType="TraversalType.LARF" @ref="Instructors[4]">
+    </CodeMirrorTest.Instructors.Kevin>
+
+    <CodeMirrorTest.Instructors.Rene UpdateFrameTime="updateFrameTime" Bounds="Bounds" Scale="globalScale" Origin="CenterOrigin"
+                                     StartPosition="reneStartPosition" Speed="speed" TraversalType="TraversalType.LARF" @ref="Instructors[5]">
+    </CodeMirrorTest.Instructors.Rene>
+
+    <CodeMirrorTest.Instructors.Isaac UpdateFrameTime="updateFrameTime" Bounds="Bounds" Scale="globalScale" Origin="CenterOrigin"
+                                     StartPosition="isaacStartPosition" Speed="speed" TraversalType="TraversalType.ARFL" @ref="Instructors[6]">
+    </CodeMirrorTest.Instructors.Isaac>
+
+}
+
+@code {
+
+    BECanvasComponent canvas;
+    Canvas2DContext context;
+
+    TimeSpan updateFrameTime = TimeSpan.FromMilliseconds(50);
+    Rectangle Bounds;
+    Vector2 globalScale = Vector2.One / 2;
+    OriginType CenterOrigin = OriginType.Center;
+
+    Vector2 speed = new Vector2(3, 3);
+
+    #region BenData
+    Vector2 benStartPos;
+    #endregion
+
+    #region StanData
+    Rectangle stanBounds;
+    Vector2 stanStartPos;
+    #endregion
+
+    #region AbeData
+    Vector2 abeStartPos;
+    #endregion
+
+    #region Aria
+    Vector2 ariaStartPosition;
+    #endregion
+
+    #region Kevin
+    Vector2 kevinStartPosition;
+    #endregion
+
+    #region Rene
+    Vector2 reneStartPosition;
+    #endregion
+
+    #region IsaacData
+    Vector2 isaacStartPosition;
+    #endregion
+
+    GeneralInstructor[] Instructors = new GeneralInstructor[7];
+
+    ElementReference globalDiv;
+    ElementReference div;
+    ElementReference loginElementRef;
+
+    Button loginButton;
+
+
+    bool canRun = false;
+
+    Point lastMousePos = new Point(0, 0);
+    Point mousePos = new Point(0, 0);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRunTime.InvokeVoidAsync("setFocusTo", globalDiv);
+            int margin = 5;
+            StaticStuff.CanvasWidth = await JSRunTime.InvokeAsync<int>("getWindowWidth") - margin * 4;
+            StaticStuff.CanvasHeight = await JSRunTime.InvokeAsync<int>("getWindowHeight") - margin * 2;
+
+            Bounds = new Rectangle(0, 0, StaticStuff.CanvasWidth, StaticStuff.CanvasHeight);
+            benStartPos = new Vector2(147 / 4, 149 / 4);
+            abeStartPos = new Vector2(StaticStuff.CanvasWidth / 2, 164 / 4);
+            ariaStartPosition = new Vector2(StaticStuff.CanvasWidth - 136 / 4, 153 / 4);
+            kevinStartPosition = new Vector2(StaticStuff.CanvasWidth - 158 / 4, StaticStuff.CanvasHeight - 95);
+            reneStartPosition = new Vector2(StaticStuff.CanvasWidth / 2, StaticStuff.CanvasHeight - 93);
+            isaacStartPosition = new Vector2(150 / 4, StaticStuff.CanvasHeight - 93);
+
+            context = await canvas.CreateCanvas2DAsync();
+            canRun = true;
+
+            var meow = "";
+
+            ContentLoad();
+
+            await GameLoop();
+        }
+    }
+
+    async Task GameLoop()
+    {
+        while (true)
+        {
+            await Update();
+            await Draw();
+
+            await Task.Delay(1000 / 60);
+        }
+    }
+
+    void ContentLoad()
+    {
+        float speedX = 3;
+        float speedY = 3;
+
+        loginButton = new Button(new Vector2(StaticStuff.CanvasWidth / 2, StaticStuff.CanvasHeight / 2), 500, 100, Vector2.One, OriginType.Center)
+        {
+            Element = loginElementRef
+        };
+        var startX = loginButton.Position.X - loginButton.ScaledWidth / 2 - 40;
+        var startY = loginButton.Position.Y - loginButton.ScaledHeight / 2 - 90;
+        stanStartPos = new Vector2(startX, startY);
+        stanBounds = new Rectangle((int)startX - 40, (int)startY - 35, (int)(loginButton.Position.X + loginButton.ScaledWidth / 2 + 80), (int)(loginButton.Position.Y + loginButton.ScaledHeight / 2 + 120));
+
+        StateHasChanged();
+    }
+
+
+    async Task Update()
+    {
+        await loginButton.Update(context);
+
+        foreach (var instructor in Instructors)
+        {
+            await instructor.Update(context);
+        }
+    }
+
+    async Task Draw()
+    {
+        await context.BeginBatchAsync();
+        await context.ClearRectAsync(0, 0, StaticStuff.CanvasWidth, StaticStuff.CanvasHeight);
+
+        foreach (var instructor in Instructors)
+        {
+            await instructor.Draw(context);
+        }
+
+        await loginButton.Draw(context);
+
+        await context.StrokeRectAsync(0, 0, StaticStuff.CanvasWidth, StaticStuff.CanvasHeight);
+
+        await context.EndBatchAsync();
+    }
+
+    async void MouseDown(MouseEventArgs m)
+    {
+        //if the user clicked then the div loses focus and we can no longer recieve
+        //keyboard input so we must call it again
+        await JSRunTime.InvokeVoidAsync("setFocusTo", globalDiv);
+
+        if (loginButton.Contains(new Vector2((float)m.ClientX, (float)m.ClientY)))
+        {
+            NM.NavigateTo("https://github.com/login/oauth/authorize?client_id=d3b4dc0c47cc3b2228cd");
+        }
+    }
+
+    async void MouseUp(MouseEventArgs m)
+    {
+
+    }
+
+    async void KeyUp(KeyboardEventArgs k)
+    {
+
+    }
+
+    async void KeyDown(KeyboardEventArgs k)
+    {
+
+    }
+}    

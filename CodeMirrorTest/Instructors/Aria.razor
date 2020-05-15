@@ -1,0 +1,72 @@
+﻿@inherits GeneralInstructor
+
+<img src="/images/LoginScreen/Aria/FrontFaceAria.png" style="display:none" @ref="FrontFaceAria" />
+<img src="/images/LoginScreen/Aria/LeftFaceAria.png" style="display:none" @ref="LeftFaceAria" />
+<img src="/images/LoginScreen/Aria/BackFaceAria.png" style="display:none" @ref="BackFaceAria" />
+<img src="/images/LoginScreen/Aria/RightFaceAria.png" style="display:none" @ref="RightFaceAria" />
+
+@using BlazorCanvasLIB;
+
+@code {
+    ElementReference FrontFaceAria;
+    ElementReference LeftFaceAria;
+    ElementReference BackFaceAria;
+    ElementReference RightFaceAria;
+
+    public override Dictionary<Direction, float> WidthMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.F] = 136,
+                [Direction.L] = 144,
+                [Direction.A] = 136,
+                [Direction.R] = 144
+            };
+        }
+    }
+
+    public override Dictionary<Direction, float> HeightMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.F] = 153,
+                [Direction.L] = 153,
+                [Direction.A] = 151,
+                [Direction.R] = 153
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> HeadMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = FrontFaceAria,
+                [Direction.L] = LeftFaceAria,
+                [Direction.A] = BackFaceAria,
+                [Direction.R] = RightFaceAria,
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> BodyMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = StaticStuff.WalkBodyTowardMedium,
+                [Direction.L] = StaticStuff.WalkBodyLeftMedium,
+                [Direction.A] = StaticStuff.WalkBodyAwayMedium,
+                [Direction.R] = StaticStuff.WalkBodyRightMedium,
+            };
+        }
+    }
+}
+

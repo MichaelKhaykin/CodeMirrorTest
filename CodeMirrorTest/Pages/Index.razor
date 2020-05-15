@@ -1,0 +1,77 @@
+﻿@page "/Game"
+
+@inject NavigationManager NavigationManager;  
+@inject IJSRuntime JSRunTime;
+
+<textarea id="editor"></textarea>
+<button type="button" @onclick="RunCode">Run Code!</button>
+
+@code {
+
+    Compiler compiler = new Compiler();
+    HttpClient client = new HttpClient();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var code = await JSRunTime.InvokeAsync<string>("getQuery", "code");
+
+            var parameters = new[]
+            {
+                KeyValuePair.Create("client_id", "d3b4dc0c47cc3b2228cd"),
+                KeyValuePair.Create("client_secret", "9c3b47544445ed2c47a530bd1b0d32e0cb675ad1"),
+                KeyValuePair.Create("code", code)
+            };
+
+            var body = new FormUrlEncodedContent(parameters);
+
+            var response = await client.PostAsync("https://github.com/login/oauth/access_token", body);
+            var token = await response.Content.ReadAsStringAsync();
+
+            var splits = token.Split('=', '&');
+            var accessToken = splits[1];
+
+            var sendString = string.Concat("https://api.github.com/user?access_token=", accessToken);
+
+            client.DefaultRequestHeaders.UserAgent.Add(System.Net.Http.Headers.ProductInfoHeaderValue.Parse("MyBlazorApp"));
+
+
+            var nextResponse = await client.GetAsync(sendString);
+            if(nextResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                NavigationManager.NavigateTo("/");
+                return;
+            }
+
+            var finalAttempt = await nextResponse.Content.ReadAsStringAsync();
+
+
+
+
+            await JSRunTime.InvokeVoidAsync("convertToCodeMirror", "editor");
+        }
+
+        await Update();
+    }
+
+    async Task Update()
+    {
+        while (true)
+        {
+            var res = await JSRunTime.InvokeAsync<string>("getCodeMirrorValue");
+
+            var messages = compiler.Compile(res);
+
+
+            await Task.Delay(50);
+        }
+    }
+
+    async Task RunCode()
+    {
+        var res = await JSRunTime.InvokeAsync<string>("getCodeMirrorValue");
+
+        compiler.CompileAndBuild(res);
+    }
+}    

@@ -1,0 +1,70 @@
+﻿@inherits GeneralInstructor
+
+<img src="/images/LoginScreen/Rene/FrontFaceRene.png" style="display:none" @ref="FrontFaceRene"/>
+<img src="/images/LoginScreen/Rene/BackFaceRene.png" style="display:none" @ref="BackFaceRene"/>
+<img src="/images/LoginScreen/Rene/LeftFaceRene.png" style="display:none" @ref="LeftFaceRene"/>
+<img src="/images/LoginScreen/Rene/RightFaceRene.png" style="display:none" @ref="RightFaceRene"/>
+
+
+@code {
+    ElementReference FrontFaceRene;
+    ElementReference BackFaceRene;
+    ElementReference RightFaceRene;
+    ElementReference LeftFaceRene;
+
+    public override Dictionary<Direction, float> WidthMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.F] = 169,
+                [Direction.A] = 169,
+                [Direction.L] = 140,
+                [Direction.R] = 140
+            };
+        }
+    }
+
+    public override Dictionary<Direction, float> HeightMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.F] = 148,
+                [Direction.A] = 148,
+                [Direction.L] = 149,
+                [Direction.R] = 149
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> HeadMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = FrontFaceRene,
+                [Direction.A] = BackFaceRene,
+                [Direction.R] = RightFaceRene,
+                [Direction.L] = LeftFaceRene
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> BodyMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = StaticStuff.WalkBodyTowardMedium,
+                [Direction.R] = StaticStuff.WalkBodyRightMedium,
+                [Direction.L] = StaticStuff.WalkBodyLeftMedium,
+                [Direction.A] = StaticStuff.WalkBodyAwayMedium
+            };
+        }
+    }
+}

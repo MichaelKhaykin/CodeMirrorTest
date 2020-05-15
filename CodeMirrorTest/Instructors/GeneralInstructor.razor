@@ -1,0 +1,134 @@
+﻿<img src="/images/LoginScreen/Bodies/Light/WalkBodyAwayLight.png" style="display:none" @ref="StaticStuff.WalkBodyAwayLight" />
+<img src="/images/LoginScreen/Bodies/Light/WalkBodyLeftLight.png" style="display:none" @ref="StaticStuff.WalkBodyLeftLight" />
+<img src="/images/LoginScreen/Bodies/Light/WalkBodyTowardLight.png" style="display:none" @ref="StaticStuff.WalkBodyTowardLight" />
+<img src="/images/LoginScreen/Bodies/Light/WalkBodyRightLight.png" style="display:none" @ref="StaticStuff.WalkBodyRightLight" />
+
+<img src="/images/LoginScreen/Bodies/Medium/WalkBodyAwayMedium.png" style="display:none" @ref="StaticStuff.WalkBodyAwayMedium" />
+<img src="/images/LoginScreen/Bodies/Medium/WalkBodyLeftMedium.png" style="display:none" @ref="StaticStuff.WalkBodyLeftMedium" />
+<img src="/images/LoginScreen/Bodies/Medium/WalkBodyRightMedium.png" style="display:none" @ref="StaticStuff.WalkBodyRightMedium" />
+<img src="/images/LoginScreen/Bodies/Medium/WalkBodyTowardMedium.png" style="display:none" @ref="StaticStuff.WalkBodyTowardMedium" />
+
+<img src="/images/LoginScreen/Bodies/Dark/WalkBodyAwayDark.png" style="display:none" @ref="StaticStuff.WalkBodyAwayDark" />
+<img src="/images/LoginScreen/Bodies/Dark/WalkBodyLeftDark.png" style="display:none" @ref="StaticStuff.WalkBodyLeftDark" />
+<img src="/images/LoginScreen/Bodies/Dark/WalkBodyRightDark.png" style="display:none" @ref="StaticStuff.WalkBodyRightDark" />
+<img src="/images/LoginScreen/Bodies/Dark/WalkBodyTowardDark.png" style="display:none" @ref="StaticStuff.WalkBodyTowardDark" />
+
+@using System.Numerics;
+@using System.Drawing;
+@using Blazor.Extensions.Canvas.Canvas2D;
+@using BlazorCanvasLIB;
+
+@inject IJSRuntime JSRunTime
+
+@code {
+    [Parameter]
+    public TimeSpan UpdateFrameTime
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public Vector2 StartPosition { get; set; }
+
+    [Parameter]
+    public Vector2 Scale { get; set; }
+
+    [Parameter]
+    public BlazorCanvasLIB.OriginType Origin { get; set; }
+
+    [Parameter]
+    public Vector2 Speed { get; set; }
+
+    [Parameter]
+    public Rectangle Bounds { get; set; }
+
+    [Parameter]
+    public TraversalType TraversalType { get; set; }
+
+    public UIInstructor Instructor { get; set; }
+
+    public virtual Dictionary<Direction, float> WidthMap { get; set; }
+
+    public virtual Dictionary<Direction, float> HeightMap { get; set; }
+
+    public virtual Dictionary<Direction, ElementReference> HeadMap { get; set; }
+
+    public virtual Dictionary<Direction, ElementReference> BodyMap { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        if (HeadMap == null) return;
+
+
+        int count = 4;
+
+        Dictionary<Direction, Vector2> speedMap = new Dictionary<Direction, Vector2>()
+        {
+            [Direction.A] = new Vector2(0, -Speed.Y),
+            [Direction.L] = new Vector2(-Speed.X, 0),
+            [Direction.F] = new Vector2(0, Speed.Y),
+            [Direction.R] = new Vector2(Speed.X, 0)
+        };
+
+        bool isStan = this is Stan;
+
+        Dictionary<Direction, List<AnimationFrame>> frameMap = new Dictionary<Direction, List<AnimationFrame>>();
+        FrameType[] frameTypes = new FrameType[4];
+
+        int startX = isStan ? 0 : 4;
+
+        for (int i = startX; i < startX + 4; i++)
+        {
+            frameTypes[i - startX] = (FrameType)i;
+        }
+
+        frameMap.Add(Direction.F, FrameLoader.Load(frameTypes[0], Scale));
+        frameMap.Add(Direction.A, FrameLoader.Load(frameTypes[1], Scale));
+        frameMap.Add(Direction.L, FrameLoader.Load(frameTypes[2], Scale));
+        frameMap.Add(Direction.R, FrameLoader.Load(frameTypes[3], Scale));
+
+        float[] headWidths = new float[count];
+        float[] headHeights = new float[count];
+        ElementReference[] heads = new ElementReference[count];
+        ElementReference[] bodies = new ElementReference[count];
+        List<AnimationFrame>[] frames = new List<AnimationFrame>[count];
+        Vector2[] speeds = new Vector2[count];
+
+        var stringified = TraversalType.ToString();
+
+        for (int i = 0; i < count; i++)
+        {
+            var type = (Direction)stringified[i];
+            headWidths[i] = WidthMap[type];
+            headHeights[i] = HeightMap[type];
+            heads[i] = HeadMap[type];
+            bodies[i] = BodyMap[type];
+            frames[i] = frameMap[type];
+            speeds[i] = speedMap[type];
+        }
+
+        Instructor = new UIInstructor(StartPosition, headWidths, headHeights, Scale, Origin, frames, UpdateFrameTime, heads, bodies, speeds, isStan)
+        {
+            Bounds = Bounds
+        };
+    }
+
+    public virtual async Task Update(Canvas2DContext context)
+    {
+        if (Instructor == null)
+        {
+            return;
+        }
+        await Instructor.Update(context);
+    }
+    public virtual async Task Draw(Canvas2DContext context)
+    {
+        if (Instructor == null)
+        {
+            return;
+        }
+        await Instructor.Draw(context);
+    }
+}

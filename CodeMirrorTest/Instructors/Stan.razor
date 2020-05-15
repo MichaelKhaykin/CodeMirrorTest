@@ -1,0 +1,86 @@
+﻿@inherits Instructors.GeneralInstructor
+
+<img src="/images/LoginScreen/Stan//RightStanWalking/WalkBodyStanRightT.png" style="display:none" @ref="WalkBodyStanRightRef" />
+<img src="/images/LoginScreen/Stan/RightStanWalking/StanHeadRight.png" style="display:none" @ref="RightStanHeadRef" />
+<img src="/images/LoginScreen/Stan/ForwardStanWalking/StanHeadForward.png" style="display:none" @ref="ForwardStanHeadRef" />
+<img src="/images/LoginScreen/Stan/ForwardStanWalking/WalkBodyStanTowardT.png" style="display:none" @ref="WalkBodyStanForwardRef" />
+<img src="/images/LoginScreen/Stan/LeftStanWalking/WalkBodyStanLeftT.png" style="display:none" @ref="WalkBodyStanLeftRef" />
+<img src="/images/LoginScreen/Stan/LeftStanWalking/StanHeadLeft.png" style="display:none" @ref="LeftStanHeadRef" />
+<img src="/images/LoginScreen/Stan/BackwardStanWalking/StanHeadBackward.png" style="display:none" @ref="StanHeadBackward" />
+<img src="/images/LoginScreen/Stan/BackwardStanWalking/WalkBodyStanAwayT.png" style="display:none" @ref="WalkBodyStanBackwardRef" />
+
+@using System.Drawing;
+@using System.Numerics;
+@using BlazorCanvasLIB;
+@using Blazor.Extensions.Canvas.Canvas2D;
+
+@code {
+
+    ElementReference WalkBodyStanRightRef;
+    ElementReference RightStanHeadRef;
+
+    ElementReference WalkBodyStanForwardRef;
+    ElementReference ForwardStanHeadRef;
+
+    ElementReference WalkBodyStanLeftRef;
+    ElementReference LeftStanHeadRef;
+
+    ElementReference StanHeadBackward;
+    ElementReference WalkBodyStanBackwardRef;
+    
+    public override Dictionary<Direction, float> WidthMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 136,
+                [Direction.F] = 162,
+                [Direction.L] = 136,
+                [Direction.A] = 160
+            };
+        }
+    }
+
+    public override Dictionary<Direction, float> HeightMap
+    {
+        get
+        {
+            return new Dictionary<Direction, float>()
+            {
+                [Direction.R] = 140,
+                [Direction.F] = 139,
+                [Direction.L] = 140,
+                [Direction.A] = 134
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> HeadMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.F] = ForwardStanHeadRef,
+                [Direction.L] = LeftStanHeadRef,
+                [Direction.R] = RightStanHeadRef,
+                [Direction.A] = StanHeadBackward
+            };
+        }
+    }
+
+    public override Dictionary<Direction, ElementReference> BodyMap
+    {
+        get
+        {
+            return new Dictionary<Direction, ElementReference>()
+            {
+                [Direction.R] = WalkBodyStanRightRef,
+                [Direction.F] = WalkBodyStanForwardRef,
+                [Direction.L] = WalkBodyStanLeftRef,
+                [Direction.A] = WalkBodyStanBackwardRef
+            };
+        }
+    }
+}

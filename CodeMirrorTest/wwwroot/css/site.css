@@ -1,0 +1,7 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+body, html {
+    padding:0;
+    margin:5px 5px 5px 5px;
+    box-sizing:border-box;
+}
