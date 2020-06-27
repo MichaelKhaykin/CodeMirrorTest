@@ -57,10 +57,14 @@
                 autoCloseBrackets: true,
                 showTrailingSpace: true,
                 theme: "dracula",
-                mode: "text/x-csharp"
+                mode: "text/x-csharp",
             });
 
+            
             codeMirrorEditor.setValue("using System;\nnamespace GMRHackers\n{\n    class Program\n    {\n        static void Main(string[] args)\n        {\n        }\n    }\n} ");
+
+            //canvas = document.getElementById(Container).children[0];
+            //canvas.appendChild(document.getElementById(editor));
         };
 
         window.getCodeMirrorValue = () => {
